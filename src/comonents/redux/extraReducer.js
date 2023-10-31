@@ -20,6 +20,7 @@ const initialState = {
   loading: null,
   error: null,
   userPost: [],
+  postLoading: false,
 };
 export const createUser = createAsyncThunk(
   "user/createUserAndProfile",
@@ -116,6 +117,22 @@ const baseStore = createSlice({
         // this is comment toooooooooooooo
         state.error = action.error.message;
       });
+    builder
+      .addCase(publishPosts.pending, (state, action) => {
+        state.postLoading = true;
+        console.log("pending")
+        // this is comment toooooooooooooo
+      })
+      // this is comment toooooooooooooo
+      .addCase(publishPosts.fulfilled, (state, action) => {
+        state.postLoading = false;
+        console.log("succses")
+
+      })
+      .addCase(publishPosts.rejected, (state, action) => {
+        // this is comment toooooooooooooo
+        state.error = action.error.message;
+      });
   },
 });
 export const { errorMessage } = baseStore.actions;
@@ -141,7 +158,7 @@ export const publishPosts = createAsyncThunk(
   "posts/publish",
   async (data, thunkAPI) => {
     console.log(data);
-    const { title, imageUpload, user,  } = data;
+    const { title, imageUpload, user } = data;
     // thisssss dapsdjao[ifhufhsafg]
     try {
       const storageRef = ref(

@@ -47,9 +47,13 @@ const CreatePost = ({ setVisibleUploadModal, user }) => {
         <>
           <div className='modal-container'>
             {selected ? (
-              <button className='btn ' onClick={publishNewPost}>
-                Publish
-              </button>
+                 <button
+                 className='btn w-full'
+                 style={{ background: "red" }}
+                 // this issss
+                 onClick={() => setVisibleUploadModal(false)}>
+                 Cancel
+               </button>
             ) : null}
             <div>
               {selected ? (
@@ -70,13 +74,9 @@ const CreatePost = ({ setVisibleUploadModal, user }) => {
                     />
             
                   </form>
-                  <button
-                    className='btn w-full'
-                    style={{ background: "red" }}
-                    // this issss
-                    onClick={() => setVisibleUploadModal(false)}>
-                    Cancel
-                  </button>
+                  <button className='btn ' onClick={publishNewPost}>
+                Publish
+              </button>
                 </>
               ) : (
                 <>
