@@ -16,7 +16,7 @@ const Profile = ({ user }) => {
   const { isL, userPost } = useSelector((state) => state.base);
   const navigate = useNavigate();
   const [userSetting, setUserSetting] = useState(false);
-
+  let currUser = JSON.parse(localStorage.getItem("currUser"));
   const handleLogOut = () => {
     auth.signOut();
     localStorage.removeItem("currUser");
@@ -24,9 +24,8 @@ const Profile = ({ user }) => {
   };
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getUserPost(user?.uid));
+    dispatch(getUserPost(currUser?.uid));
   }, []);
-  console.log(userPost);
   return (
     <>
       {isL ? (
@@ -69,17 +68,17 @@ const Profile = ({ user }) => {
                     </a>
                   </li>
                   <li class='theitemnavbar'>
-                    <a href='/home'>
+                    <a href='/homepage'>
                       <TelegramIcon sx={{ fontSize: 30 }} />
                     </a>
                   </li>
                   <li class='theitemnavbar'>
-                    <a href='/home'>
+                    <a href='/homepage'>
                       <AddBoxIcon sx={{ fontSize: 30 }} />
                     </a>
                   </li>
                   <li class='theitemnavbar'>
-                    <a href='/home'>
+                    <a href='/homepage'>
                       <FavoriteIcon sx={{ fontSize: 30 }} />
                     </a>
                   </li>

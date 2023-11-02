@@ -22,28 +22,36 @@
   // tis is style
   flex-direction: column;
   text-align: center;
+  .close__modal__icon {
+    position: absolute;
+    top: 0;
+    right: -28px;
+    top: -10px;
+    font-size: 30px;
+    cursor: pointer;
+  }
   .selected__img__container {
     img {
       width: 100%;
     }
     width: 400px;
   }
-  button{
+  button {
     height: 28px;
   }
-  form{
+  form {
     display: flex;
     flex-direction: column;
     text-align: start;
-    label{
-        font-size: 20px;
+    label {
+      font-size: 20px;
     }
-    input{
-        font-size: 20px;
-        height: 30px;
-        padding: 5px;
-        border-radius: 4px;
-        border: 2px solid rgba(78, 78, 170, 0.826);
+    input {
+      font-size: 20px;
+      height: 30px;
+      padding: 5px;
+      border-radius: 4px;
+      border: 2px solid rgba(78, 78, 170, 0.826);
     }
   }
 }

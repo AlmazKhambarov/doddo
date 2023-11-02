@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import "./CreatePost.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { publishPosts } from "../redux/extraReducer";
+import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const CreatePost = ({ setVisibleUploadModal, user }) => {
   const { postLoading } = useSelector((state) => state.base);
   var dispatch = useDispatch();
@@ -17,7 +19,7 @@ const CreatePost = ({ setVisibleUploadModal, user }) => {
     // this is func
   });
   const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("")
+  const [desc, setDesc] = useState("");
   const [file, setFile] = useState();
   const [selected, setSelected] = useState();
   const [selectedImg, setSelectedImg] = useState(false);
@@ -36,7 +38,14 @@ const CreatePost = ({ setVisibleUploadModal, user }) => {
 
   const publishNewPost = () => {
     if (data.title != null) {
-      dispatch(publishPosts({ user: user, title:title, description:desc, imageUpload:file }));
+      dispatch(
+        publishPosts({
+          user: user,
+          title: title,
+          description: desc,
+          imageUpload: file,
+        })
+      );
     }
   };
   return (
@@ -46,14 +55,19 @@ const CreatePost = ({ setVisibleUploadModal, user }) => {
       ) : (
         <>
           <div className='modal-container'>
+            <span
+              className='close__modal__icon'
+              onClick={() => setVisibleUploadModal(false)}>
+              <FontAwesomeIcon icon={faClose} />
+            </span>
             {selected ? (
-                 <button
-                 className='btn w-full'
-                 style={{ background: "red" }}
-                 // this issss
-                 onClick={() => setVisibleUploadModal(false)}>
-                 Cancel
-               </button>
+              <button
+                className='btn w-full'
+                style={{ background: "red" }}
+                // this issss
+                onClick={() => setVisibleUploadModal(false)}>
+                Cancel
+              </button>
             ) : null}
             <div>
               {selected ? (
@@ -64,19 +78,17 @@ const CreatePost = ({ setVisibleUploadModal, user }) => {
                     <img src={selectedImg} alt='' />
                   </div>
                   <form>
-                    <label>title</label>
                     <input
                       placeholder='title'
                       type='text'
-                      // this is create modal for insta
+                      style={{ marginTop: "20px" }}
                       className='form-controller'
                       onChange={(e) => setTitle(e.target.value)}
                     />
-            
                   </form>
                   <button className='btn ' onClick={publishNewPost}>
-                Publish
-              </button>
+                    Publish
+                  </button>
                 </>
               ) : (
                 <>

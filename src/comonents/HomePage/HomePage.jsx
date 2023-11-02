@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import { firestore } from "../redux/api";
 import CreatePost from "../CreatePost/CreatePost";
 import Loader from "../Loader/Loader";
+import Likes from "../Likes/Likes";
+import Comments from "../Comments/Comments";
 
 const Home = ({ user }) => {
   const { postLoading } = useSelector((state) => state.base);
@@ -44,6 +46,7 @@ const Home = ({ user }) => {
       setUsers(usersR);
     });
   }, []);
+
   const handleInputChange = (event) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
@@ -54,10 +57,10 @@ const Home = ({ user }) => {
     );
     setFilteredData(filteredResults);
   };
-  console.log(users);
-  const filtredUsers = users.filter((x) => x?.userid == user?.uid);
+  // console.log(users);
+  const filtredUsers = users.filter((x) => x.userId !== user?.uid);
   console.log(filtredUsers);
-  console.log(user?.uid);
+  // console.log(user?.uid);
   return (
     <>
       {postLoading ? (
@@ -217,7 +220,7 @@ const Home = ({ user }) => {
                     <div class='card-data conta-flex'>
                       <div class='card-icons conta-flex'>
                         <span class='card-icon card-icon-left'>
-                          {/* <Likes id={el.id} likes={el.likes} /> */}
+                          <Likes id={el.id} likes={el.likes} />
                         </span>
                         {/* this is Home and this do everiy think */}
                         <span class='card-icon card-icon-left'>
@@ -243,14 +246,14 @@ const Home = ({ user }) => {
                         See more comments
                       </span>
                       {/* this is Home and this do everiy think */}
-                      {/* {commentModal == el.id ? (
-                    <Comment
+                      {commentModal == el.id ? (
+                    <Comments
                       id={el.id}
                       postImg={el.imageUrl}
                       setCommentModal={setCommentModal}
                       createdUserPhoto={el.createdUserPhoto}
                     />
-                  ) : null} */}
+                  ) : null}
                       <span class='card-time'></span>
                       <div class='add-comment-container conta-flex'>
                         <span class='card-icon'>
@@ -286,7 +289,7 @@ const Home = ({ user }) => {
                     <span class='suggestions-text'>Suggestions for you</span>
                     <span class='sidebar-btn-alt'>See all</span>
                   </div>
-                  {users.map((el) => (
+                  {filtredUsers.map((el) => (
                     <div class='sidebar-card sidebar-card-alt grid'>
                       <img
                         src={el.userPhoto}
@@ -303,7 +306,9 @@ const Home = ({ user }) => {
                         {/* this is Home and this do everiy think */}
                         Lorem.
                       </span>
-                      <span class='sidebar-btn'>Follow</span>
+                      <span class='sidebar-btn'>
+                        <a href={`/profile/${el.id}`}>see</a>
+                      </span>
                       {/* this is Home and this do everiy think */}
                     </div>
                   ))}

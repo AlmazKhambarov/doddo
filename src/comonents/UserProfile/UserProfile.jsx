@@ -8,25 +8,76 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { auth } from "../redux/api";
+import { auth, firestore } from "../redux/api";
 import { getUserPost } from "../redux/extraReducer";
+import {
+  arrayRemove,
+  arrayUnion,
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+} from "firebase/firestore";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLeftLong } from "@fortawesome/free-solid-svg-icons";
 const UserProfile = ({ user }) => {
   const { isL, userPost } = useSelector((state) => state.base);
   const navigate = useNavigate();
   const [userSetting, setUserSetting] = useState(false);
-
+  const [users, setUsers] = useState([]);
   const handleLogOut = () => {
     auth.signOut();
     localStorage.removeItem("currUser");
     navigate("/");
   };
+  var params = useParams();
+  //  console
+  useEffect(() => {
+    const userRef = collection(firestore, "Users");
+    const q = query(userRef, orderBy("userPhoto", "asc"));
+    onSnapshot(q, (snapshot) => {
+      const usersR = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setUsers(usersR);
+    });
+  }, [params]);
+  const res = users?.find((x) => x.id == params.id);
+  console.log(res);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getUserPost(user?.uid));
-  }, []);
-  console.log(userPost);
+    dispatch(getUserPost(res?.userId));
+  }, [res]);
+  const followsRef = doc(firestore, "Users", params.id);
+  console.log(followsRef);
+  const handleLike = () => {
+    if (res?.followers?.includes(user.uid)) {
+      updateDoc(followsRef, {
+        followers: arrayRemove(user.uid),
+      })
+        .then(() => {
+          console.log("unliked");
+        })
+        .catch((e) => {
+          alert(e);
+          console.log(e);
+        });
+    } else {
+      updateDoc(followsRef, {
+        followers: arrayUnion(user.uid),
+      })
+        .then(() => {})
+        .catch((e) => {
+          // this is funtion
+          alert(e);
+        });
+    }
+  };
   return (
     <>
       {isL ? (
@@ -69,17 +120,17 @@ const UserProfile = ({ user }) => {
                     </a>
                   </li>
                   <li class='theitemnavbar'>
-                    <a href='/home'>
+                    <a href='/homepage'>
                       <TelegramIcon sx={{ fontSize: 30 }} />
                     </a>
                   </li>
                   <li class='theitemnavbar'>
-                    <a href='/home'>
+                    <a href='/homepage'>
                       <AddBoxIcon sx={{ fontSize: 30 }} />
                     </a>
                   </li>
                   <li class='theitemnavbar'>
-                    <a href='/home'>
+                    <a href='/homepage'>
                       <FavoriteIcon sx={{ fontSize: 30 }} />
                     </a>
                   </li>
@@ -99,6 +150,9 @@ const UserProfile = ({ user }) => {
             <header>
               {/* this is profile navbar */}
               <div class='container'>
+                <span style={{fontSize:"30px", cursor:"pointer", }} onClick={()=>navigate(-1)}>
+                  <FontAwesomeIcon  icon={faLeftLong}/>
+                </span>
                 <div class='profile'>
                   <div class='profile-image'>
                     <img src={user?.photoURL} alt='' />
@@ -106,23 +160,22 @@ const UserProfile = ({ user }) => {
                   {/* this is profile navbar */}
 
                   <div class='prof-us-prof-settings'>
-                    <h1 class='prof-us-prof-name'>{user?.displayName}</h1>
-
-                    <button
-                      class=' profile-edit-btn'
-                      onClick={() => setUserSetting(!userSetting)}>
-                      Follow
-                    </button>
+                    <h1 class='prof-us-prof-name'>{res?.userName}</h1>
+                    <span onClick={handleLike} className="followers">
+                      {!res?.followers?.includes(user?.uid)
+                        ? "follow"
+                        : "unfollow"}
+                    </span>
                     {/* this is profile navbar */}
                   </div>
 
                   <div class='profile-stats'>
                     <ul>
                       <li>
-                        <span class='profile-stat-count'>1</span> posts
+                        <span class='profile-stat-count'>{userPost?.length}</span> posts
                       </li>
                       <li>
-                        <span class='profile-stat-count'>0</span> followers
+                        <span class='profile-stat-count'>{res?.followers.length}</span> followers
                       </li>
                       <li>
                         <span class='profile-stat-count'>0</span> following
@@ -133,10 +186,9 @@ const UserProfile = ({ user }) => {
 
                   <div class='profile-bio'>
                     <p>
-                      <span class='profile-real-name'>{user?.displayName}</span>{" "}
+                      <span class='profile-real-name'>{res?.userName}</span>{" "}
                       {/* this is profile navbar */}
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit
-                      📷✈️🏕️
+                      {}//bio 📷✈️🏕️
                     </p>
                   </div>
                 </div>

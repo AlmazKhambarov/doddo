@@ -39,6 +39,8 @@ export const createUser = createAsyncThunk(
         userName: data.name,
         userEmail: data.email,
         userId: user.user.uid,
+        userBio: "",
+        followers: [],
       };
       const usersRef = collection(firestore, "Users");
       await addDoc(usersRef, usersData);
@@ -120,14 +122,13 @@ const baseStore = createSlice({
     builder
       .addCase(publishPosts.pending, (state, action) => {
         state.postLoading = true;
-        console.log("pending")
+        console.log("pending");
         // this is comment toooooooooooooo
       })
       // this is comment toooooooooooooo
       .addCase(publishPosts.fulfilled, (state, action) => {
         state.postLoading = false;
-        console.log("succses")
-
+        console.log("succses");
       })
       .addCase(publishPosts.rejected, (state, action) => {
         // this is comment toooooooooooooo
