@@ -11,11 +11,13 @@ import {
   Timestamp,
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   query,
   where,
 } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 const initialState = {
   loading: null,
   error: null,
@@ -58,7 +60,28 @@ export const createUser = createAsyncThunk(
     }
   }
 );
+export const deletePost = createAsyncThunk("Delete", async (payload) => {
+  console.log(payload);
 
+  const storageRef = ref(storage, payload.name);
+
+  // Check if the file exists before attempting to delete it
+  try {
+    await getDownloadURL(storageRef);
+
+    // The file exists, so delete it
+    await deleteObject(storageRef);
+
+    console.log("File deleted successfully");
+
+    // Also delete the corresponding document in Firestore
+    await deleteDoc(doc(firestore, "Articles", payload.id));
+
+    console.log("Document deleted successfully");
+  } catch (error) {
+    console.error("Error deleting file or document:", error);
+  }
+});
 export const UserLogin = createAsyncThunk("login", async (data, thunkAPI) => {
   try {
     const user = await signInWithEmailAndPassword(
@@ -134,6 +157,21 @@ const baseStore = createSlice({
         // this is comment toooooooooooooo
         state.error = action.error.message;
       });
+    builder
+      .addCase(updateUserName.pending, (state, action) => {
+        state.postLoading = true;
+        console.log("pending");
+        // this is comment toooooooooooooo
+      })
+      // this is comment toooooooooooooo
+      .addCase(updateUserName.fulfilled, (state, action) => {
+        state.postLoading = false;
+        console.log("succses");
+      })
+      .addCase(updateUserName.rejected, (state, action) => {
+        // this is comment toooooooooooooo
+        state.error = action.error.message;
+      });
   },
 });
 export const { errorMessage } = baseStore.actions;
@@ -194,6 +232,20 @@ export const publishPosts = createAsyncThunk(
       return {}; // You can return data if needed
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateUserName = createAsyncThunk(
+  "user/changeProfile",
+  async (data, { rejectWithValue }) => {
+    console.log(data);
+    try {
+      await updateProfile(auth.currentUser, {
+        displayName: data.username,
+      });
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   }
 );

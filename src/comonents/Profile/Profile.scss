@@ -159,9 +159,17 @@
       align-items: center;
       position: absolute;
       top: 0;
-      // width: 100%;
+      width: 100%;
+      // max-width: 20px;
+      margin: 0 auto;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.3);
+    }
+    .galler{
+      display: none;
+    }
+    .galler:hover{
+      display: flex;
     }
   
     // this is style for user panel
@@ -173,6 +181,7 @@
       display: inline-block;
       font-size: 1.7rem;
       font-weight: 600;
+      width: 60px;
       // this is style for user panel
     }
   
@@ -261,6 +270,7 @@
         padding: 0;
         text-align: center;
         margin-top: 1rem;
+        width: 10px
       }
   
       .profile-edit-btn {

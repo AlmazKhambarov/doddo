@@ -12,6 +12,8 @@ import CreatePost from "../CreatePost/CreatePost";
 import Loader from "../Loader/Loader";
 import Likes from "../Likes/Likes";
 import Comments from "../Comments/Comments";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment } from "@fortawesome/free-solid-svg-icons";
 
 const Home = ({ user }) => {
   const { postLoading } = useSelector((state) => state.base);
@@ -221,6 +223,12 @@ const Home = ({ user }) => {
                       <div class='card-icons conta-flex'>
                         <span class='card-icon card-icon-left'>
                           <Likes id={el.id} likes={el.likes} />
+                          <FontAwesomeIcon
+                            icon={faComment}
+                            onClick={() => setCommentModal(el.id)}
+                            className='comment__icon'
+                            style={{ fontSize: "23px" }}
+                          />
                         </span>
                         {/* this is Home and this do everiy think */}
                         <span class='card-icon card-icon-left'>
@@ -247,13 +255,13 @@ const Home = ({ user }) => {
                       </span>
                       {/* this is Home and this do everiy think */}
                       {commentModal == el.id ? (
-                    <Comments
-                      id={el.id}
-                      postImg={el.imageUrl}
-                      setCommentModal={setCommentModal}
-                      createdUserPhoto={el.createdUserPhoto}
-                    />
-                  ) : null}
+                        <Comments
+                          id={el.id}
+                          postImg={el.imageUrl}
+                          setCommentModal={setCommentModal}
+                          createdUserPhoto={el.createdUserPhoto}
+                        />
+                      ) : null}
                       <span class='card-time'></span>
                       <div class='add-comment-container conta-flex'>
                         <span class='card-icon'>

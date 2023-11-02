@@ -379,6 +379,10 @@ header {
 
 .card-icon-left {
     justify-content: start;
+    display: flex;
+    .comment__icon{
+        margin: -6px 10px;
+    }
 }
 
 .card-icon-right {

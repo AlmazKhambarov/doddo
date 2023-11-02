@@ -12,8 +12,16 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { auth } from "../redux/api";
 import { getUserPost } from "../redux/extraReducer";
+import EditModal from "./EditModal";
+import Loader from "../Loader/Loader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faDeleteLeft,
+  faRemove,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 const Profile = ({ user }) => {
-  const { isL, userPost } = useSelector((state) => state.base);
+  const { postLoading, userPost } = useSelector((state) => state.base);
   const navigate = useNavigate();
   const [userSetting, setUserSetting] = useState(false);
   let currUser = JSON.parse(localStorage.getItem("currUser"));
@@ -28,8 +36,8 @@ const Profile = ({ user }) => {
   }, []);
   return (
     <>
-      {isL ? (
-        <h2>Loading...</h2>
+      {postLoading ? (
+        <Loader />
       ) : (
         <>
           <header class='grid this-head'>
@@ -140,7 +148,6 @@ const Profile = ({ user }) => {
                     <p>
                       <span class='profile-real-name'>{user?.displayName}</span>{" "}
                       {/* this is profile navbar */}
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit
                       📷✈️🏕️
                     </p>
                   </div>
@@ -156,35 +163,24 @@ const Profile = ({ user }) => {
                     <div class='gallery-item'>
                       <div className='img__container'>
                         <img src={el.imageUrl} class='gallery-image' alt='' />
+                        <FontAwesomeIcon icon={faTrash} />
                       </div>
 
-                      <div class='gallery-item-info'>
-                        <ul>
-                          <li class='gallery-item-likes'>
-                            <span class='visually-hidden'>Likes:</span>
-                            {/* this is profile navbar */}
-                            <i class='fas fa-heart' aria-hidden='true'></i> 34
-                          </li>
-                          <li class='gallery-item-comments'>
-                            <span class='visually-hidden'>Comments:</span>
-                            <i class='fas fa-comment' aria-hidden='true'></i> 1
-                          </li>
-                        </ul>
-                      </div>
+                      <div class='galler'></div>
                     </div>
                   ))}
                 </div>
               </div>
             </main>
           </div>
-          {/* {userSetting ? (
-            <ModalItem
+          {userSetting ? (
+            <EditModal
               userPhoto={user?.photoURL}
               user={user}
               userName={user?.displayName}
               setUserSetting={setUserSetting}
             />
-          ) : null} */}
+          ) : null}
         </>
       )}
     </>
