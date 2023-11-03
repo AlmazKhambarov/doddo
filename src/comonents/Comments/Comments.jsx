@@ -13,6 +13,9 @@ import { v4 as uuidv4 } from "uuid";
 
 import "./Comments.scss";
 import { auth, firestore } from "../redux/api";
+import { SlackSelector } from "@charkour/react-reactions";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClose, faFaceSmile } from "@fortawesome/free-solid-svg-icons";
 export default function Comments({
   id,
   commentp,
@@ -21,6 +24,7 @@ export default function Comments({
   setCommentModal,
 }) {
   const [comment, setComment] = useState("");
+  const [visibleReaction, setVisibleReaction] = useState(false);
   const [comments, setComments] = useState([]);
   const [users, setUser] = useState();
   useEffect(() => {
@@ -52,7 +56,15 @@ export default function Comments({
       });
     }
   };
-
+  // const [inputValue, setInputValue] = useState("")
+  const handleAddReaction = (reaction) => {
+    if (comment) {
+      let newValue = comment + reaction;
+      setComment(newValue);
+    } else {
+      setComment(reaction);
+    }
+  };
   // delete comment function
   const handleDeleteComment = (comment) => {
     console.log(comment);
@@ -105,19 +117,33 @@ export default function Comments({
                   )
                 )}
               </ul>
+              <div className='input__box'>
+                <input
+                  type='text'
+                  name='comment'
+                  placeholder='Add a comment'
+                  value={comment}
+                  onKeyUp={(e) => {
+                    handleChangeComment(e);
+                  }}
+                  onChange={(e) => {
+                    setComment(e.target.value);
+                  }}
+                />
+                <span onClick={() => setVisibleReaction(!visibleReaction)}>
+                  <FontAwesomeIcon icon={faFaceSmile} />
+                </span>
+                {visibleReaction ? (
+                  <div className='reactions'>
+                    <FontAwesomeIcon
+                      icon={faClose}
+                      onClick={() => setVisibleReaction(!visibleReaction)}
+                    />
+                    <SlackSelector onSelect={(e) => handleAddReaction(e)} />
+                  </div>
+                ) : null}
+              </div>
 
-              <input
-                type='text'
-                name='comment'
-                placeholder='Add a comment'
-                value={comment}
-                onKeyUp={(e) => {
-                  handleChangeComment(e);
-                }}
-                onChange={(e) => {
-                  setComment(e.target.value);
-                }}
-              />
               <button onClick={() => handleChangeComment("button")}>
                 Submit
               </button>
