@@ -14,6 +14,7 @@ import Likes from "../Likes/Likes";
 import Comments from "../Comments/Comments";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment } from "@fortawesome/free-solid-svg-icons";
+import SearchBar from "./SearchBar";
 
 const Home = ({ user }) => {
   const { postLoading } = useSelector((state) => state.base);
@@ -94,14 +95,14 @@ const Home = ({ user }) => {
                         placeholder='Search...'
                         onChange={handleInputChange}
                       />
-                      {/* {searchTerm ? <SearchedUser data={filteredData} /> : null} */}
+                      {searchTerm ? <SearchBar data={filteredData} /> : null}
                     </div>
                   </label>
                 </div>
                 <nav class='headoItem main-nav'>
                   <ul class='navbar conta-flex'>
                     <li class='theitemnavbar'>
-                      <a href='/home'>
+                      <a href='/homepage'>
                         <TelegramIcon sx={{ fontSize: 30 }} />
                       </a>
                     </li>

@@ -14,15 +14,23 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  onSnapshot,
+  orderBy,
   query,
   where,
 } from "firebase/firestore";
-import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 const initialState = {
   loading: null,
   error: null,
   userPost: [],
   postLoading: false,
+  users: [],
 };
 export const createUser = createAsyncThunk(
   "user/createUserAndProfile",
@@ -63,16 +71,16 @@ export const createUser = createAsyncThunk(
 export const deletePost = createAsyncThunk("Delete", async (payload) => {
   console.log(payload);
 
-  const storageRef = ref(storage, payload.name);
+  // const storageRef = ref(storage, payload.name);
 
   // Check if the file exists before attempting to delete it
   try {
-    await getDownloadURL(storageRef);
+    // await getDownloadURL(storageRef);
 
-    // The file exists, so delete it
-    await deleteObject(storageRef);
+    // // The file exists, so delete it
+    // await deleteObject(storageRef);
 
-    console.log("File deleted successfully");
+    // console.log("File deleted successfully");
 
     // Also delete the corresponding document in Firestore
     await deleteDoc(doc(firestore, "Articles", payload.id));
@@ -172,6 +180,36 @@ const baseStore = createSlice({
         // this is comment toooooooooooooo
         state.error = action.error.message;
       });
+      builder
+      .addCase(deletePost.pending, (state, action) => {
+        state.postLoading = true;
+        console.log("pending");
+        // this is comment toooooooooooooo
+      })
+      // this is comment toooooooooooooo
+      .addCase(deletePost.fulfilled, (state, action) => {
+        state.postLoading = false;
+        console.log("succses");
+      })
+      .addCase(deletePost.rejected, (state, action) => {
+        // this is comment toooooooooooooo
+        state.error = action.error.message;
+      });
+    builder
+      .addCase(fetchUsersAsync.pending, (state, action) => {
+        // state.postLoading = true;
+        console.log("pending");
+        // this is comment toooooooooooooo
+      })
+      // this is comment toooooooooooooo
+      .addCase(fetchUsersAsync.fulfilled, (state, action) => {
+        state.users = false;
+        console.log("succses");
+      })
+      .addCase(fetchUsersAsync.rejected, (state, action) => {
+        // this is comment toooooooooooooo
+        state.error = action.error.message;
+      });
   },
 });
 export const { errorMessage } = baseStore.actions;
@@ -192,6 +230,25 @@ export const getUserPost = createAsyncThunk(
   }
 );
 
+export const fetchUsersAsync = createAsyncThunk(
+  "users/fetchUsers",
+  async (_, {rejectWithValue }) => {
+    const userRef = collection(firestore, "Users");
+    const q = query(userRef, orderBy("userPhoto",  "desc"));
+
+    try {
+      const snapshot = await onSnapshot(q);
+      const usersR = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log(usersR)
+      return usersR;
+    } catch (error) {
+      return rejectWithValue({ error: error.message });
+    }
+  }
+);
 // thisssss dapsdjao[ifhufhsafg]
 export const publishPosts = createAsyncThunk(
   "posts/publish",

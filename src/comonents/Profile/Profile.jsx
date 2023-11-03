@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import "./Profile.scss";
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import SettingsIcon from "@mui/icons-material/Settings";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import AddBoxIcon from "@mui/icons-material/AddBox";
@@ -10,8 +11,8 @@ import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { auth } from "../redux/api";
-import { getUserPost } from "../redux/extraReducer";
+import { auth, firestore } from "../redux/api";
+import { deletePost, fetchUsersAsync, getUserPost } from "../redux/extraReducer";
 import EditModal from "./EditModal";
 import Loader from "../Loader/Loader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,20 +21,53 @@ import {
   faRemove,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { confirmAlert } from "react-confirm-alert";
 const Profile = ({ user }) => {
   const { postLoading, userPost } = useSelector((state) => state.base);
   const navigate = useNavigate();
   const [userSetting, setUserSetting] = useState(false);
+  const [users, setUsers] = useState([]);
   let currUser = JSON.parse(localStorage.getItem("currUser"));
   const handleLogOut = () => {
     auth.signOut();
     localStorage.removeItem("currUser");
     navigate("/");
   };
+  useEffect(() => {
+    const userRef = collection(firestore, "Users");
+    const q = query(userRef, orderBy("userPhoto", "asc"));
+    onSnapshot(q, (snapshot) => {
+      const usersR = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setUsers(usersR);
+    });
+  }, []);
+  var currentUserId = users?.find((el) => el.userEmail === user?.email);
   const dispatch = useDispatch();
   useEffect(() => {
+    dispatch(fetchUsersAsync());
     dispatch(getUserPost(currUser?.uid));
-  }, []);
+  }, [postLoading]);
+  const handleClickConfirm = (name, id) => {
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Are you sure to do this.",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => dispatch(deletePost({ id:id}))
+        },
+        {
+          label: "No",
+          onClick: () => alert("Click No"),
+        },
+      ],
+    });
+  };
+  console.log(userPost);
   return (
     <>
       {postLoading ? (
@@ -132,10 +166,16 @@ const Profile = ({ user }) => {
                   <div class='profile-stats'>
                     <ul>
                       <li>
-                        <span class='profile-stat-count'>1</span> posts
+                        <span class='profile-stat-count'>
+                          {userPost?.length}
+                        </span>{" "}
+                        posts
                       </li>
                       <li>
-                        <span class='profile-stat-count'>0</span> followers
+                        <span class='profile-stat-count'>
+                          {currentUserId?.followers.length}
+                        </span>{" "}
+                        followers
                       </li>
                       <li>
                         <span class='profile-stat-count'>0</span> following
@@ -146,8 +186,10 @@ const Profile = ({ user }) => {
 
                   <div class='profile-bio'>
                     <p>
-                      <span class='profile-real-name'>{user?.displayName}</span>{" "}
-                      {/* this is profile navbar */}
+                      <span class='profile-real-name'>
+                        {user?.displayName}:
+                      </span>{" "}
+                      {currentUserId?.userBio}
                       📷✈️🏕️
                     </p>
                   </div>
@@ -163,8 +205,12 @@ const Profile = ({ user }) => {
                     <div class='gallery-item'>
                       <div className='img__container'>
                         <img src={el.imageUrl} class='gallery-image' alt='' />
-                        <FontAwesomeIcon icon={faTrash} />
                       </div>
+                      <FontAwesomeIcon
+                        icon={faTrash}
+                        className='trash__icon'
+                        onClick={() => handleClickConfirm(el.name, el.id)}
+                      />
 
                       <div class='galler'></div>
                     </div>
@@ -176,7 +222,7 @@ const Profile = ({ user }) => {
           {userSetting ? (
             <EditModal
               userPhoto={user?.photoURL}
-              user={user}
+              users={users}
               userName={user?.displayName}
               setUserSetting={setUserSetting}
             />

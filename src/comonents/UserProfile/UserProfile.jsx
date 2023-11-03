@@ -114,7 +114,6 @@ const UserProfile = ({ user }) => {
               <nav class='headoItem main-nav'>
                 <ul class='navbar conta-flex'>
                   <li class='theitemnavbar'>
-                    {/* this is profile navbar */}
                     <a href='/homepage'>
                       <HomeIcon sx={{ fontSize: 30 }} />
                     </a>
@@ -157,8 +156,6 @@ const UserProfile = ({ user }) => {
                   <div class='profile-image'>
                     <img src={user?.photoURL} alt='' />
                   </div>
-                  {/* this is profile navbar */}
-
                   <div class='prof-us-prof-settings'>
                     <h1 class='prof-us-prof-name'>{res?.userName}</h1>
                     <span onClick={handleLike} className="followers">
